@@ -1,29 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<title>Detect JSBridge</title>
+    <meta charset="UTF-8">
+    <title>跳转应用市场</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            background-color: #ff6700;
+            color: white;
+            border-radius: 8px;
+        }
+        button:hover {
+            background-color: #e65a00;
+        }
+    </style>
 </head>
 <body>
-<h1>Detect JSBridge Interfaces</h1>
-<pre id="output"></pre>
-<script>
-function detectJSBridge() {
-    const output = document.getElementById('output');
-    const bridges = [];
-    for (let key in window) {
-        try {
-            if (typeof window[key] === 'object' || typeof window[key] === 'function') {
-                bridges.push(key);
-            }
-        } catch(e) {
-            // 有些属性访问会抛异常
-        }
-    }
-    output.textContent = JSON.stringify(bridges, null, 2);
-}
+    <button id="openMarketBtn">打开应用市场</button>
 
-window.onload = detectJSBridge;
-</script>
+    <script>
+        document.getElementById('openMarketBtn').addEventListener('click', function() {
+            // 跳转到指定市场页面
+            window.location.href = "market://details?ref=update_sdk&back=true&startDownload=true&id=com.xiaomi.account";
+
+            // 可选：如果在某些浏览器或WebView中不支持 market:// 协议，可以做兜底处理
+            setTimeout(function() {
+                alert('请确保设备已安装应用市场！');
+            }, 2000);
+        });
+    </script>
 </body>
 </html>
