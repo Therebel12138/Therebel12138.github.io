@@ -1,14 +1,27 @@
-<button id="darkBtn">检查暗模式</button>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>调用 getDeviceInfo</title>
+</head>
+<body>
+<h1>获取设备信息</h1>
+<button onclick="getDeviceInfo()">获取设备信息</button>
+<pre id="output"></pre>
+
 <script>
-document.getElementById('darkBtn').addEventListener('click', function() {
-    // 调用 Android JSBridge
-    if (window.PASSPORT_JSB_METHOD_INVOKER) {
-        // invoke 方法可能返回 JSON 字符串
-        let result = window.PASSPORT_JSB_METHOD_INVOKER.invoke('isInDarkMode', '{}');
-        console.log('isInDarkMode:', result);
-        alert('isInDarkMode: ' + result);
-    } else {
-        alert('JSBridge 未绑定');
+function getDeviceInfo() {
+    try {
+        // 调用 JSBridge 方法
+        // 注意这里的方式可能根据实现不同而略有差异
+        PASSPORT_JSB_METHOD_INVOKER.invoke("getDeviceInfo", {}, function(result) {
+            // result 就是 q7.e 对象序列化后的结果
+            document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+        });
+    } catch (e) {
+        document.getElementById('output').textContent = "调用失败: " + e;
     }
-});
+}
 </script>
+</body>
+</html>
