@@ -2,38 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Show Cookie and Info</title>
-<script>
-function showInfo() {
-    // 获取 cookie
-    var cookies = document.cookie;
-
-    // 获取页面 URL
-    var url = window.location.href;
-
-    // 获取 User-Agent
-    var userAgent = navigator.userAgent;
-
-    // 获取浏览器语言
-    var language = navigator.language;
-
-    // 获取屏幕分辨率
-    var screenRes = window.screen.width + "x" + window.screen.height;
-
-    // 构造提示信息
-    var info = "Cookies: " + cookies + "\n" +
-               "URL: " + url + "\n" +
-               "User-Agent: " + userAgent + "\n" +
-               "Language: " + language + "\n" +
-               "Screen Resolution: " + screenRes;
-
-    // 弹出
-    alert(info);
-}
-</script>
+<title>Detect JSBridge</title>
 </head>
 <body>
-<h1>Click the button to show info</h1>
-<button onclick="showInfo()">Show Info</button>
+<h1>Detect JSBridge Interfaces</h1>
+<pre id="output"></pre>
+<script>
+function detectJSBridge() {
+    const output = document.getElementById('output');
+    const bridges = [];
+    for (let key in window) {
+        try {
+            if (typeof window[key] === 'object' || typeof window[key] === 'function') {
+                bridges.push(key);
+            }
+        } catch(e) {
+            // 有些属性访问会抛异常
+        }
+    }
+    output.textContent = JSON.stringify(bridges, null, 2);
+}
+
+window.onload = detectJSBridge;
+</script>
 </body>
 </html>
