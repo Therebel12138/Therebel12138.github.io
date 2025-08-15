@@ -1,43 +1,14 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>跳转应用市场</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            border: none;
-            background-color: #ff6700;
-            color: white;
-            border-radius: 8px;
-        }
-        button:hover {
-            background-color: #e65a00;
-        }
-    </style>
-</head>
-<body>
-    <button id="openMarketBtn">打开应用市场</button>
-
-    <script>
-        document.getElementById('openMarketBtn').addEventListener('click', function() {
-            // 跳转到指定市场页面
-            window.location.href = "market://details?ref=update_sdk&back=true&startDownload=true&id=com.smile.gifmaker";
-
-            // 可选：如果在某些浏览器或WebView中不支持 market:// 协议，可以做兜底处理
-            setTimeout(function() {
-                alert('请确保设备已安装应用市场！');
-            }, 2000);
-        });
-    </script>
-</body>
-</html>
+<button id="darkBtn">检查暗模式</button>
+<script>
+document.getElementById('darkBtn').addEventListener('click', function() {
+    // 调用 Android JSBridge
+    if (window.PASSPORT_JSB_METHOD_INVOKER) {
+        // invoke 方法可能返回 JSON 字符串
+        let result = window.PASSPORT_JSB_METHOD_INVOKER.invoke('isInDarkMode', '{}');
+        console.log('isInDarkMode:', result);
+        alert('isInDarkMode: ' + result);
+    } else {
+        alert('JSBridge 未绑定');
+    }
+});
+</script>
