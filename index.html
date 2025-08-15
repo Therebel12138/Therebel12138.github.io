@@ -1,46 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>JSBridge 调用示例</title>
-</head>
-<body>
-<h1>调用 JSBridge 接口示例</h1>
-<button id="getDeviceInfoBtn">获取设备信息</button>
-
-<script>
-// 等待 JSBridge 准备好
-function waitForJSBridge(callback) {
-    if (window.PASSPORT_JSB_METHOD_INVOKER && typeof window.PASSPORT_JSB_METHOD_INVOKER.invoke === 'function') {
-        callback();
-    } else {
-        setTimeout(function() {
-            waitForJSBridge(callback);
-        }, 100); // 每 100ms 检查一次
-    }
-}
-
-// 初始化按钮事件
-waitForJSBridge(function() {
-    console.log('JSBridge 已准备好');
-
-    document.getElementById('getDeviceInfoBtn').addEventListener('click', function() {
-        var callbackId = 'cb_' + Date.now();
-
-        try {
-            window.PASSPORT_JSB_METHOD_INVOKER.invoke(
-                'getDeviceInfo',
-                { callbackId: callbackId },
-                function(response) {
-                    console.log('设备信息返回:', response);
-                    alert('设备信息已打印到控制台');
-                }
-            );
-        } catch (e) {
-            console.error('调用失败:', e);
-        }
-    });
-});
-</script>
-</body>
+<html>
+  <body>
+    <script>
+      alert(document.cookie || '无cookie');
+    </script>
+  </body>
 </html>
