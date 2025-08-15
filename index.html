@@ -1,27 +1,29 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>调用 getDeviceInfo</title>
+<title>Detect JSBridge</title>
 </head>
 <body>
-<h1>获取设备信息</h1>
-<button onclick="getDeviceInfo()">获取设备信息</button>
+<h1>Detect JSBridge Interfaces</h1>
 <pre id="output"></pre>
-
 <script>
-function getDeviceInfo() {
-    try {
-        // 调用 JSBridge 方法
-        // 注意这里的方式可能根据实现不同而略有差异
-        PASSPORT_JSB_METHOD_INVOKER.invoke("getDeviceInfo", {}, function(result) {
-            // result 就是 q7.e 对象序列化后的结果
-            document.getElementById('output').textContent = JSON.stringify(result, null, 2);
-        });
-    } catch (e) {
-        document.getElementById('output').textContent = "调用失败: " + e;
+function detectJSBridge() {
+    const output = document.getElementById('output');
+    const bridges = [];
+    for (let key in window) {
+        try {
+            if (typeof window[key] === 'object' || typeof window[key] === 'function') {
+                bridges.push(key);
+            }
+        } catch(e) {
+            // 有些属性访问会抛异常
+        }
     }
+    output.textContent = JSON.stringify(bridges, null, 2);
 }
+
+window.onload = detectJSBridge;
 </script>
 </body>
 </html>
