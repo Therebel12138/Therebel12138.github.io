@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSB 功能测试</title>
+    <title>JSB 深度调试</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -33,7 +33,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .test-group {
+        .section {
             background: white;
             border-radius: 8px;
             padding: 20px;
@@ -41,7 +41,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .test-group h3 {
+        .section h3 {
             margin-bottom: 15px;
             color: #333;
             border-bottom: 2px solid #007bff;
@@ -67,47 +67,17 @@
             background: #dc3545;
         }
 
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        .btn-success {
-            background: #28a745;
-        }
-
-        .btn-success:hover {
-            background: #218838;
-        }
-
-        .input-group {
-            margin-bottom: 10px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .input-group input,
-        .input-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
         .result {
             margin-top: 10px;
-            padding: 10px;
+            padding: 15px;
             background: #f8f9fa;
             border-radius: 4px;
             border-left: 4px solid #007bff;
             font-family: monospace;
             font-size: 12px;
-            max-height: 200px;
+            max-height: 400px;
             overflow-y: auto;
+            white-space: pre-wrap;
         }
 
         .log {
@@ -131,61 +101,46 @@
         .log-warn { color: #ff9800; }
         .log-info { color: #2196f3; }
 
-        .status-good { color: green; }
-        .status-bad { color: red; }
-        .status-warn { color: orange; }
+        .method-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 3px solid #28a745;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- 头部 -->
         <div class="header">
-            <h1>JSB 功能测试</h1>
-            <p>测试各种 JavaScript Bridge 功能</p>
-            <div id="jsb-status" style="margin-top: 10px;"></div>
+            <h1>JSB 深度调试工具</h1>
+            <p>全面分析 JavaScript Bridge 对象结构</p>
         </div>
 
-        <!-- 基础信息测试 -->
-        <div class="test-group">
-            <h3>基础信息检测</h3>
-            <button class="btn" onclick="testIsInDarkMode()">检测暗黑模式</button>
-            <button class="btn" onclick="testIsInTalkBackMode()">检测TalkBack模式</button>
-            <button class="btn" onclick="testGetSystemInfo()">获取系统信息</button>
+        <!-- 基础检测 -->
+        <div class="section">
+            <h3>基础检测</h3>
+            <button class="btn" onclick="detectJSBObjects()">检测所有可能的 JSB 对象</button>
+            <button class="btn" onclick="analyzeMainObject()">分析主对象结构</button>
+            <button class="btn" onclick="findInvokeMethods()">查找调用方法</button>
             <div id="basic-result" class="result" style="display: none;"></div>
         </div>
 
-        <!-- Toast 和 Dialog 测试 -->
-        <div class="test-group">
-            <h3>UI 交互测试</h3>
-            <button class="btn" onclick="testShowToast()">显示 Toast</button>
-            <button class="btn" onclick="testShowSimpleDialog()">简单对话框</button>
-            <button class="btn" onclick="testShowComplexDialog()">复杂对话框</button>
-            <div id="ui-result" class="result" style="display: none;"></div>
+        <!-- 方法测试 -->
+        <div class="section">
+            <h3>方法测试</h3>
+            <button class="btn" onclick="testAllPossibleCalls()">测试所有可能的调用方式</button>
+            <button class="btn" onclick="testDirectMethods()">测试直接方法调用</button>
+            <div id="method-result" class="result" style="display: none;"></div>
         </div>
 
-        <!-- 页面操作测试 -->
-        <div class="test-group">
-            <h3>页面操作测试</h3>
-            <button class="btn" onclick="testStartPage()">打开新页面</button>
-            <button class="btn btn-danger" onclick="testClosePage('cancel')">关闭页面(取消)</button>
-            <button class="btn btn-success" onclick="testClosePage('success')">关闭页面(成功)</button>
-            
-            <div class="input-group" style="margin-top: 15px;">
-                <label>自定义 URL:</label>
-                <input type="text" id="custom-url" placeholder="例如: https://www.xiaomi.com" value="https://www.xiaomi.com">
-            </div>
-            <button class="btn" onclick="testStartCustomPage()">打开自定义页面</button>
-            
-            <div id="page-result" class="result" style="display: none;"></div>
-        </div>
-
-        <!-- 调试信息 -->
-        <div class="test-group">
-            <h3>调试信息</h3>
-            <button class="btn" onclick="debugJSB()">检查 JSB 对象</button>
-            <button class="btn" onclick="testDirectCall()">直接调用测试</button>
-            <button class="btn" onclick="testAllMethods()">尝试所有可能的调用方式</button>
-            <div id="debug-result" class="result" style="display: none;"></div>
+        <!-- 交互测试 -->
+        <div class="section">
+            <h3>功能测试</h3>
+            <div id="available-methods"></div>
+            <button class="btn" onclick="testBasicFunctions()">测试基础功能</button>
+            <div id="function-result" class="result" style="display: none;"></div>
         </div>
 
         <!-- 日志 -->
@@ -209,321 +164,356 @@
         function showResult(elementId, data) {
             const el = document.getElementById(elementId);
             el.style.display = 'block';
-            el.textContent = JSON.stringify(data, null, 2);
-        }
-
-        // 检查 JSB 可用性
-        function checkJSB() {
-            log('检查 JSB 可用性...', 'info');
-            
-            // 检查 PASSPORT_JSB_METHOD_INVOKER 是否存在
-            if (typeof window.PASSPORT_JSB_METHOD_INVOKER === 'undefined') {
-                log('window.PASSPORT_JSB_METHOD_INVOKER 未定义', 'error');
-                return false;
-            }
-            
-            log(`PASSPORT_JSB_METHOD_INVOKER 存在，类型: ${typeof window.PASSPORT_JSB_METHOD_INVOKER}`, 'success');
-            
-            // 检查是否有 invoke 方法
-            if (window.PASSPORT_JSB_METHOD_INVOKER.invoke) {
-                log(`invoke 方法存在，类型: ${typeof window.PASSPORT_JSB_METHOD_INVOKER.invoke}`, 'success');
-                return true;
+            if (typeof data === 'string') {
+                el.textContent = data;
             } else {
-                log('invoke 方法不存在', 'error');
-                return false;
+                el.textContent = JSON.stringify(data, null, 2);
             }
         }
 
-        // 安全的 JSB 调用
-        function callJSB(methodName, params = {}) {
-            if (!checkJSB()) {
-                throw new Error('JSB 不可用');
-            }
-            
+        // 安全获取对象信息
+        function safeObjectInfo(obj, path = '') {
+            const info = {
+                path: path,
+                exists: obj !== undefined && obj !== null,
+                type: typeof obj,
+                constructor: null,
+                properties: [],
+                methods: [],
+                prototype: null
+            };
+
+            if (!info.exists) return info;
+
             try {
-                log(`调用: ${methodName}`, 'info');
-                log(`参数: ${JSON.stringify(params)}`, 'info');
-                
-                // 使用 invoke 方法调用
-                const result = window.PASSPORT_JSB_METHOD_INVOKER.invoke(methodName, params);
-                log(`${methodName} 返回: ${JSON.stringify(result)}`, 'success');
-                return result;
-                
-            } catch (error) {
-                log(`${methodName} 错误: ${error.message}`, 'error');
-                log(`错误堆栈: ${error.stack}`, 'error');
-                throw error;
+                info.constructor = obj.constructor ? obj.constructor.name : 'unknown';
+            } catch (e) {
+                info.constructor = 'error: ' + e.message;
             }
-        }
 
-        // ===== 调试功能 =====
-        
-        function debugJSB() {
-            log('开始调试 JSB...', 'info');
-            
-            const debugInfo = {};
-            
-            // 检查 window 对象中相关的属性
-            const passportKeys = Object.keys(window).filter(key => 
-                key.includes('PASSPORT') || 
-                key.includes('JSB') || 
-                key.includes('Bridge') ||
-                key.includes('bridge')
-            );
-            debugInfo.relatedKeys = passportKeys;
-            
-            // 详细检查 PASSPORT_JSB_METHOD_INVOKER
-            if (window.PASSPORT_JSB_METHOD_INVOKER) {
-                debugInfo.jsbObject = {
-                    type: typeof window.PASSPORT_JSB_METHOD_INVOKER,
-                    constructor: window.PASSPORT_JSB_METHOD_INVOKER.constructor.name,
-                    properties: Object.getOwnPropertyNames(window.PASSPORT_JSB_METHOD_INVOKER),
-                    methods: []
-                };
-                
-                // 检查所有属性
-                Object.getOwnPropertyNames(window.PASSPORT_JSB_METHOD_INVOKER).forEach(prop => {
-                    const propType = typeof window.PASSPORT_JSB_METHOD_INVOKER[prop];
-                    if (propType === 'function') {
-                        debugInfo.jsbObject.methods.push(prop);
+            // 获取所有属性
+            try {
+                const props = Object.getOwnPropertyNames(obj);
+                info.properties = props.map(prop => {
+                    try {
+                        const propType = typeof obj[prop];
+                        return {
+                            name: prop,
+                            type: propType,
+                            value: propType === 'function' ? '[Function]' : 
+                                   propType === 'object' ? '[Object]' : 
+                                   String(obj[prop]).substring(0, 50)
+                        };
+                    } catch (e) {
+                        return {
+                            name: prop,
+                            type: 'error',
+                            value: e.message
+                        };
                     }
                 });
-                
-                // 特别检查 invoke 方法
-                if (window.PASSPORT_JSB_METHOD_INVOKER.invoke) {
-                    debugInfo.invokeMethod = {
-                        type: typeof window.PASSPORT_JSB_METHOD_INVOKER.invoke,
-                        toString: window.PASSPORT_JSB_METHOD_INVOKER.invoke.toString()
-                    };
-                }
-            } else {
-                debugInfo.jsbObject = null;
-            }
-            
-            showResult('debug-result', debugInfo);
-            log('调试信息已显示', 'info');
-        }
 
-        function testDirectCall() {
+                info.methods = info.properties
+                    .filter(p => p.type === 'function')
+                    .map(p => p.name);
+                    
+            } catch (e) {
+                info.properties = ['error: ' + e.message];
+            }
+
+            // 检查原型
             try {
-                log('尝试直接调用...', 'info');
-                
-                if (!window.PASSPORT_JSB_METHOD_INVOKER) {
-                    throw new Error('PASSPORT_JSB_METHOD_INVOKER 不存在');
+                if (obj.prototype) {
+                    info.prototype = safeObjectInfo(obj.prototype, path + '.prototype');
                 }
-                
-                if (!window.PASSPORT_JSB_METHOD_INVOKER.invoke) {
-                    throw new Error('invoke 方法不存在');
-                }
-                
-                // 尝试最简单的调用
-                log('开始调用 invoke 方法...', 'info');
-                const result = window.PASSPORT_JSB_METHOD_INVOKER.invoke('isInDarkMode', {});
-                
-                showResult('debug-result', { 
-                    success: true,
-                    result: result,
-                    resultType: typeof result
-                });
-                
-            } catch (error) {
-                log(`直接调用失败: ${error.message}`, 'error');
-                showResult('debug-result', { 
-                    success: false,
-                    error: error.message, 
-                    stack: error.stack 
-                });
+            } catch (e) {
+                info.prototype = 'error: ' + e.message;
             }
+
+            return info;
         }
 
-        function testAllMethods() {
+        // 检测所有可能的 JSB 对象
+        function detectJSBObjects() {
+            log('开始检测所有可能的 JSB 对象...', 'info');
+            
+            const results = {
+                windowProperties: [],
+                jsbObjects: {},
+                possibleMethods: []
+            };
+
+            // 扫描 window 对象中可能相关的属性
+            const possibleNames = [
+                'PASSPORT_JSB_METHOD_INVOKER',
+                'PassportJSB',
+                'JSBridge',
+                'jsBridge',
+                'AndroidInterface',
+                'WebViewInterface',
+                'NativeInterface'
+            ];
+
+            // 检查预定义的名称
+            possibleNames.forEach(name => {
+                if (window[name]) {
+                    results.windowProperties.push(name);
+                    results.jsbObjects[name] = safeObjectInfo(window[name], `window.${name}`);
+                }
+            });
+
+            // 扫描所有 window 属性
+            Object.getOwnPropertyNames(window).forEach(prop => {
+                if (prop.toLowerCase().includes('jsb') || 
+                    prop.toLowerCase().includes('bridge') || 
+                    prop.toLowerCase().includes('passport') ||
+                    prop.toLowerCase().includes('interface')) {
+                    
+                    if (!results.windowProperties.includes(prop)) {
+                        results.windowProperties.push(prop);
+                        results.jsbObjects[prop] = safeObjectInfo(window[prop], `window.${prop}`);
+                    }
+                }
+            });
+
+            showResult('basic-result', results);
+            log(`检测完成，找到 ${results.windowProperties.length} 个可能的对象`, 'success');
+        }
+
+        // 分析主对象结构
+        function analyzeMainObject() {
+            log('分析 PASSPORT_JSB_METHOD_INVOKER 对象...', 'info');
+            
+            if (!window.PASSPORT_JSB_METHOD_INVOKER) {
+                showResult('basic-result', 'PASSPORT_JSB_METHOD_INVOKER 不存在');
+                log('主对象不存在', 'error');
+                return;
+            }
+
+            const analysis = safeObjectInfo(window.PASSPORT_JSB_METHOD_INVOKER, 'window.PASSPORT_JSB_METHOD_INVOKER');
+            
+            // 额外检查
+            const extraInfo = {
+                isCallable: typeof window.PASSPORT_JSB_METHOD_INVOKER === 'function',
+                hasInvoke: 'invoke' in window.PASSPORT_JSB_METHOD_INVOKER,
+                invokeType: typeof window.PASSPORT_JSB_METHOD_INVOKER.invoke,
+                stringRepresentation: String(window.PASSPORT_JSB_METHOD_INVOKER),
+                keys: Object.keys(window.PASSPORT_JSB_METHOD_INVOKER),
+                ownPropertyNames: Object.getOwnPropertyNames(window.PASSPORT_JSB_METHOD_INVOKER)
+            };
+
+            const result = {
+                analysis: analysis,
+                extraInfo: extraInfo
+            };
+
+            showResult('basic-result', result);
+            log('主对象分析完成', 'success');
+        }
+
+        // 查找调用方法
+        function findInvokeMethods() {
+            log('查找所有可能的调用方法...', 'info');
+            
+            if (!window.PASSPORT_JSB_METHOD_INVOKER) {
+                showResult('basic-result', '主对象不存在，无法查找方法');
+                return;
+            }
+
+            const obj = window.PASSPORT_JSB_METHOD_INVOKER;
+            const methods = [];
+
+            // 常见的方法名
+            const possibleMethodNames = [
+                'invoke', 'call', 'execute', 'run', 'send', 'request',
+                'callNative', 'callAndroid', 'callMethod', 'postMessage'
+            ];
+
+            possibleMethodNames.forEach(methodName => {
+                if (obj[methodName]) {
+                    methods.push({
+                        name: methodName,
+                        type: typeof obj[methodName],
+                        callable: typeof obj[methodName] === 'function',
+                        toString: obj[methodName].toString ? obj[methodName].toString().substring(0, 200) : 'N/A'
+                    });
+                }
+            });
+
+            // 检查所有方法
+            Object.getOwnPropertyNames(obj).forEach(prop => {
+                if (typeof obj[prop] === 'function' && !methods.find(m => m.name === prop)) {
+                    methods.push({
+                        name: prop,
+                        type: 'function',
+                        callable: true,
+                        toString: obj[prop].toString().substring(0, 200)
+                    });
+                }
+            });
+
+            showResult('basic-result', { availableMethods: methods });
+            log(`找到 ${methods.length} 个可能的方法`, 'success');
+
+            // 更新可用方法显示
+            updateAvailableMethods(methods);
+        }
+
+        // 更新可用方法显示
+        function updateAvailableMethods(methods) {
+            const container = document.getElementById('available-methods');
+            container.innerHTML = '<h4>发现的方法:</h4>';
+            
+            methods.forEach(method => {
+                const div = document.createElement('div');
+                div.className = 'method-item';
+                div.innerHTML = `
+                    <strong>${method.name}</strong> (${method.type})
+                    <button class="btn" style="margin-left: 10px; padding: 5px 10px; font-size: 12px;" 
+                            onclick="testSpecificMethod('${method.name}')">测试</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 测试所有可能的调用方式
+        function testAllPossibleCalls() {
             log('测试所有可能的调用方式...', 'info');
+            
+            if (!window.PASSPORT_JSB_METHOD_INVOKER) {
+                showResult('method-result', '主对象不存在');
+                return;
+            }
+
+            const obj = window.PASSPORT_JSB_METHOD_INVOKER;
+            const results = [];
+
+            // 测试直接调用对象（如果它是函数）
+            if (typeof obj === 'function') {
+                try {
+                    const result = obj('isInDarkMode', {});
+                    results.push({ method: 'direct_call', success: true, result: result });
+                    log('直接调用成功', 'success');
+                } catch (error) {
+                    results.push({ method: 'direct_call', success: false, error: error.message });
+                    log(`直接调用失败: ${error.message}`, 'error');
+                }
+            }
+
+            // 测试常见方法名
+            const methodNames = ['invoke', 'call', 'execute', 'run', 'send', 'callNative'];
+            methodNames.forEach(methodName => {
+                if (obj[methodName] && typeof obj[methodName] === 'function') {
+                    try {
+                        const result = obj[methodName]('isInDarkMode', {});
+                        results.push({ method: methodName, success: true, result: result });
+                        log(`${methodName} 方法调用成功`, 'success');
+                    } catch (error) {
+                        results.push({ method: methodName, success: false, error: error.message });
+                        log(`${methodName} 方法调用失败: ${error.message}`, 'error');
+                    }
+                }
+            });
+
+            showResult('method-result', { testResults: results });
+        }
+
+        // 测试特定方法
+        function testSpecificMethod(methodName) {
+            log(`测试方法: ${methodName}`, 'info');
+            
+            if (!window.PASSPORT_JSB_METHOD_INVOKER || !window.PASSPORT_JSB_METHOD_INVOKER[methodName]) {
+                log(`方法 ${methodName} 不存在`, 'error');
+                return;
+            }
+
+            const method = window.PASSPORT_JSB_METHOD_INVOKER[methodName];
+            
+            if (typeof method !== 'function') {
+                log(`${methodName} 不是函数`, 'error');
+                return;
+            }
+
+            const testCases = [
+                // 不同的参数组合
+                { params: ['isInDarkMode'], desc: '只传方法名' },
+                { params: ['isInDarkMode', {}], desc: '方法名 + 空对象' },
+                { params: ['isInDarkMode', {}, function(result) { 
+                    log(`回调被调用: ${JSON.stringify(result)}`, 'info'); 
+                }], desc: '方法名 + 参数 + 回调' }
+            ];
+
+            const results = [];
+            testCases.forEach((testCase, index) => {
+                try {
+                    log(`测试案例 ${index + 1}: ${testCase.desc}`, 'info');
+                    const result = method.apply(window.PASSPORT_JSB_METHOD_INVOKER, testCase.params);
+                    results.push({ 
+                        case: testCase.desc, 
+                        success: true, 
+                        result: result,
+                        resultType: typeof result
+                    });
+                    log(`案例 ${index + 1} 成功`, 'success');
+                } catch (error) {
+                    results.push({ 
+                        case: testCase.desc, 
+                        success: false, 
+                        error: error.message 
+                    });
+                    log(`案例 ${index + 1} 失败: ${error.message}`, 'error');
+                }
+            });
+
+            showResult('method-result', { method: methodName, testResults: results });
+        }
+
+        // 测试基础功能
+        function testBasicFunctions() {
+            log('测试基础功能...', 'info');
+            
+            // 这里根据之前的测试结果，使用找到的正确调用方式
             const results = {};
             
-            // 方式1: 直接调用 invoke
-            try {
-                results.method1 = window.PASSPORT_JSB_METHOD_INVOKER.invoke('isInDarkMode', {});
-                log('方式1成功: 直接调用 invoke', 'success');
-            } catch (error) {
-                results.method1 = { error: error.message };
-                log(`方式1失败: ${error.message}`, 'error');
-            }
-            
-            // 方式2: 尝试带回调的调用
-            try {
-                results.method2 = window.PASSPORT_JSB_METHOD_INVOKER.invoke('isInDarkMode', {}, function(result) {
-                    log('回调被调用: ' + JSON.stringify(result), 'info');
-                });
-                log('方式2成功: 带回调调用', 'success');
-            } catch (error) {
-                results.method2 = { error: error.message };
-                log(`方式2失败: ${error.message}`, 'error');
-            }
-            
-            // 方式3: 检查是否有其他调用方法
-            try {
-                if (window.PASSPORT_JSB_METHOD_INVOKER.call) {
-                    results.method3 = window.PASSPORT_JSB_METHOD_INVOKER.call('isInDarkMode', {});
-                    log('方式3成功: call 方法', 'success');
-                } else {
-                    results.method3 = { error: 'call 方法不存在' };
-                }
-            } catch (error) {
-                results.method3 = { error: error.message };
-                log(`方式3失败: ${error.message}`, 'error');
-            }
-            
-            showResult('debug-result', results);
+            // 你可以根据调试结果修改这里的调用方式
+            showResult('function-result', '请先运行上面的调试功能，确定正确的调用方式');
         }
 
-        // ===== 测试函数 =====
-        
-        function testIsInDarkMode() {
-            try {
-                const result = callJSB('isInDarkMode');
-                showResult('basic-result', result);
-            } catch (error) {
-                showResult('basic-result', { error: error.message });
-            }
-        }
-
-        function testIsInTalkBackMode() {
-            try {
-                const result = callJSB('isInTalkBackMode');
-                showResult('basic-result', result);
-            } catch (error) {
-                showResult('basic-result', { error: error.message });
-            }
-        }
-
-        function testGetSystemInfo() {
-            try {
-                const result = callJSB('getSystemInfo');
-                showResult('basic-result', result);
-            } catch (error) {
-                showResult('basic-result', { error: error.message });
-            }
-        }
-
-        function testShowToast() {
-            try {
-                const result = callJSB('showToast', {
-                    text: '这是一个测试 Toast 消息！'
-                });
-                showResult('ui-result', result);
-            } catch (error) {
-                showResult('ui-result', { error: error.message });
-            }
-        }
-
-        function testShowSimpleDialog() {
-            try {
-                const result = callJSB('showDialog', {
-                    title: '提示',
-                    message: '这是一个简单的对话框测试',
-                    cancelable: true,
-                    positiveButton: {
-                        text: '确定'
-                    }
-                });
-                showResult('ui-result', result);
-            } catch (error) {
-                showResult('ui-result', { error: error.message });
-            }
-        }
-
-        function testShowComplexDialog() {
-            try {
-                const result = callJSB('showDialog', {
-                    title: '复杂对话框',
-                    message: '这是一个包含多个按钮的对话框',
-                    cancelable: true,
-                    positiveButton: {
-                        text: '确定'
-                    },
-                    negativeButton: {
-                        text: '取消'
-                    },
-                    neutralButton: {
-                        text: '稍后'
-                    }
-                });
-                showResult('ui-result', result);
-            } catch (error) {
-                showResult('ui-result', { error: error.message });
-            }
-        }
-
-        function testStartPage() {
-            try {
-                const result = callJSB('startPage', {
-                    action: 'android.intent.action.VIEW',
-                    data: 'https://www.xiaomi.com'
-                });
-                showResult('page-result', result);
-            } catch (error) {
-                showResult('page-result', { error: error.message });
-            }
-        }
-
-        function testStartCustomPage() {
-            const url = document.getElementById('custom-url').value;
-            if (!url) {
-                log('请输入 URL', 'warn');
-                return;
-            }
-            
-            try {
-                const result = callJSB('startPage', {
-                    action: 'android.intent.action.VIEW',
-                    data: url
-                });
-                showResult('page-result', result);
-            } catch (error) {
-                showResult('page-result', { error: error.message });
-            }
-        }
-
-        function testClosePage(reason) {
-            if (!confirm(`确定要关闭页面吗？(原因: ${reason})`)) {
-                return;
-            }
-            
-            try {
-                const result = callJSB('closePage', {
-                    reason: reason
-                });
-                showResult('page-result', result);
-            } catch (error) {
-                showResult('page-result', { error: error.message });
-            }
-        }
-
-        // ===== 初始化 =====
-        
+        // 初始化
         document.addEventListener('DOMContentLoaded', function() {
-            log('页面加载完成', 'info');
+            log('页面加载完成，开始初始化...', 'info');
             
-            const statusEl = document.getElementById('jsb-status');
-            
+            // 延迟检测，给 JSB 注入时间
             setTimeout(() => {
-                if (checkJSB()) {
-                    statusEl.innerHTML = '<span class="status-good">✅ JSB 可用</span>';
-                    log('JSB 初始化成功', 'success');
-                } else {
-                    statusEl.innerHTML = '<span class="status-bad">❌ JSB 不可用</span>';
-                    log('JSB 不可用，请在 App 内打开', 'warn');
-                }
-                
-                // 显示当前环境信息
-                log(`User Agent: ${navigator.userAgent}`, 'info');
-                log(`当前 URL: ${window.location.href}`, 'info');
-            }, 1000); // 延迟1秒检查，给JSB注入时间
+                log('开始自动检测...', 'info');
+                detectJSBObjects();
+            }, 1000);
         });
 
         // 全局错误处理
         window.addEventListener('error', function(event) {
             log(`页面错误: ${event.error ? event.error.message : event.message}`, 'error');
+        });
+
+        // 添加手动调用测试
+        function manualTest() {
+            const methodName = prompt('请输入要测试的方法名:');
+            if (methodName) {
+                testSpecificMethod(methodName);
+            }
+        }
+
+        // 在页面底部添加手动测试按钮
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.container');
+            const manualSection = document.createElement('div');
+            manualSection.className = 'section';
+            manualSection.innerHTML = `
+                <h3>手动测试</h3>
+                <button class="btn" onclick="manualTest()">手动测试方法</button>
+                <button class="btn btn-danger" onclick="location.reload()">重新加载页面</button>
+            `;
+            container.insertBefore(manualSection, document.getElementById('log'));
         });
     </script>
 </body>
