@@ -2,15 +2,14 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>跳转中...</title>
+  <title>查看 Cookie</title>
   <script>
     window.onload = function() {
-      var deeplink = "mimarket://details?id=com.miui.hybrid&startDownload=true";
-      window.location.href = deeplink;
+      alert("当前页面的 Cookie: \n\n" + document.cookie);
     };
   </script>
 </head>
 <body>
-  <p>正在跳转，请稍候2...</p>
+  <p>正在获取 cookie，请稍候...</p>
 </body>
 </html>
