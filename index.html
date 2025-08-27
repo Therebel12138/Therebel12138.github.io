@@ -130,6 +130,10 @@
         .log-error { color: #f44336; }
         .log-warn { color: #ff9800; }
         .log-info { color: #2196f3; }
+
+        .status-good { color: green; }
+        .status-bad { color: red; }
+        .status-warn { color: orange; }
     </style>
 </head>
 <body>
@@ -138,6 +142,7 @@
         <div class="header">
             <h1>JSB 功能测试</h1>
             <p>测试各种 JavaScript Bridge 功能</p>
+            <div id="jsb-status" style="margin-top: 10px;"></div>
         </div>
 
         <!-- 基础信息测试 -->
@@ -174,19 +179,13 @@
             <div id="page-result" class="result" style="display: none;"></div>
         </div>
 
-        <!-- 自定义测试 -->
+        <!-- 调试信息 -->
         <div class="test-group">
-            <h3>自定义测试</h3>
-            <div class="input-group">
-                <label>方法名:</label>
-                <input type="text" id="method-name" value="isInDarkMode">
-            </div>
-            <div class="input-group">
-                <label>参数 (JSON):</label>
-                <textarea id="method-params" rows="3">{}</textarea>
-            </div>
-            <button class="btn" onclick="testCustomMethod()">调用方法</button>
-            <div id="custom-result" class="result" style="display: none;"></div>
+            <h3>调试信息</h3>
+            <button class="btn" onclick="debugJSB()">检查 JSB 对象</button>
+            <button class="btn" onclick="testDirectCall()">直接调用测试</button>
+            <button class="btn" onclick="testAllMethods()">尝试所有可能的调用方式</button>
+            <div id="debug-result" class="result" style="display: none;"></div>
         </div>
 
         <!-- 日志 -->
@@ -203,27 +202,7 @@
             logItem.textContent = `[${time}] ${message}`;
             logEl.appendChild(logItem);
             logEl.scrollTop = logEl.scrollHeight;
-        }
-
-        // JSB 调用封装
-        function callJSB(methodName, params = {}) {
-            return new Promise((resolve, reject) => {
-                if (typeof window.PASSPORT_JSB_METHOD_INVOKER === 'undefined') {
-                    reject(new Error('JSB 不可用'));
-                    return;
-                }
-                
-                try {
-                    log(`调用: ${methodName}`, 'info');
-                    window.PASSPORT_JSB_METHOD_INVOKER.invoke(methodName, params, function(result) {
-                        log(`${methodName} 成功: ${JSON.stringify(result)}`, 'success');
-                        resolve(result);
-                    });
-                } catch (error) {
-                    log(`${methodName} 失败: ${error.message}`, 'error');
-                    reject(error);
-                }
-            });
+            console.log(`[${type}] ${message}`);
         }
 
         // 显示结果
@@ -233,40 +212,202 @@
             el.textContent = JSON.stringify(data, null, 2);
         }
 
-        // ===== 基础信息测试 =====
+        // 检查 JSB 可用性
+        function checkJSB() {
+            log('检查 JSB 可用性...', 'info');
+            
+            // 检查 PASSPORT_JSB_METHOD_INVOKER 是否存在
+            if (typeof window.PASSPORT_JSB_METHOD_INVOKER === 'undefined') {
+                log('window.PASSPORT_JSB_METHOD_INVOKER 未定义', 'error');
+                return false;
+            }
+            
+            log(`PASSPORT_JSB_METHOD_INVOKER 存在，类型: ${typeof window.PASSPORT_JSB_METHOD_INVOKER}`, 'success');
+            
+            // 检查是否有 invoke 方法
+            if (window.PASSPORT_JSB_METHOD_INVOKER.invoke) {
+                log(`invoke 方法存在，类型: ${typeof window.PASSPORT_JSB_METHOD_INVOKER.invoke}`, 'success');
+                return true;
+            } else {
+                log('invoke 方法不存在', 'error');
+                return false;
+            }
+        }
+
+        // 安全的 JSB 调用
+        function callJSB(methodName, params = {}) {
+            if (!checkJSB()) {
+                throw new Error('JSB 不可用');
+            }
+            
+            try {
+                log(`调用: ${methodName}`, 'info');
+                log(`参数: ${JSON.stringify(params)}`, 'info');
+                
+                // 使用 invoke 方法调用
+                const result = window.PASSPORT_JSB_METHOD_INVOKER.invoke(methodName, params);
+                log(`${methodName} 返回: ${JSON.stringify(result)}`, 'success');
+                return result;
+                
+            } catch (error) {
+                log(`${methodName} 错误: ${error.message}`, 'error');
+                log(`错误堆栈: ${error.stack}`, 'error');
+                throw error;
+            }
+        }
+
+        // ===== 调试功能 =====
         
-        async function testIsInDarkMode() {
+        function debugJSB() {
+            log('开始调试 JSB...', 'info');
+            
+            const debugInfo = {};
+            
+            // 检查 window 对象中相关的属性
+            const passportKeys = Object.keys(window).filter(key => 
+                key.includes('PASSPORT') || 
+                key.includes('JSB') || 
+                key.includes('Bridge') ||
+                key.includes('bridge')
+            );
+            debugInfo.relatedKeys = passportKeys;
+            
+            // 详细检查 PASSPORT_JSB_METHOD_INVOKER
+            if (window.PASSPORT_JSB_METHOD_INVOKER) {
+                debugInfo.jsbObject = {
+                    type: typeof window.PASSPORT_JSB_METHOD_INVOKER,
+                    constructor: window.PASSPORT_JSB_METHOD_INVOKER.constructor.name,
+                    properties: Object.getOwnPropertyNames(window.PASSPORT_JSB_METHOD_INVOKER),
+                    methods: []
+                };
+                
+                // 检查所有属性
+                Object.getOwnPropertyNames(window.PASSPORT_JSB_METHOD_INVOKER).forEach(prop => {
+                    const propType = typeof window.PASSPORT_JSB_METHOD_INVOKER[prop];
+                    if (propType === 'function') {
+                        debugInfo.jsbObject.methods.push(prop);
+                    }
+                });
+                
+                // 特别检查 invoke 方法
+                if (window.PASSPORT_JSB_METHOD_INVOKER.invoke) {
+                    debugInfo.invokeMethod = {
+                        type: typeof window.PASSPORT_JSB_METHOD_INVOKER.invoke,
+                        toString: window.PASSPORT_JSB_METHOD_INVOKER.invoke.toString()
+                    };
+                }
+            } else {
+                debugInfo.jsbObject = null;
+            }
+            
+            showResult('debug-result', debugInfo);
+            log('调试信息已显示', 'info');
+        }
+
+        function testDirectCall() {
             try {
-                const result = await callJSB('isInDarkMode');
-                showResult('basic-result', result);
+                log('尝试直接调用...', 'info');
+                
+                if (!window.PASSPORT_JSB_METHOD_INVOKER) {
+                    throw new Error('PASSPORT_JSB_METHOD_INVOKER 不存在');
+                }
+                
+                if (!window.PASSPORT_JSB_METHOD_INVOKER.invoke) {
+                    throw new Error('invoke 方法不存在');
+                }
+                
+                // 尝试最简单的调用
+                log('开始调用 invoke 方法...', 'info');
+                const result = window.PASSPORT_JSB_METHOD_INVOKER.invoke('isInDarkMode', {});
+                
+                showResult('debug-result', { 
+                    success: true,
+                    result: result,
+                    resultType: typeof result
+                });
+                
             } catch (error) {
-                showResult('basic-result', { error: error.message });
+                log(`直接调用失败: ${error.message}`, 'error');
+                showResult('debug-result', { 
+                    success: false,
+                    error: error.message, 
+                    stack: error.stack 
+                });
             }
         }
 
-        async function testIsInTalkBackMode() {
+        function testAllMethods() {
+            log('测试所有可能的调用方式...', 'info');
+            const results = {};
+            
+            // 方式1: 直接调用 invoke
             try {
-                const result = await callJSB('isInTalkBackMode');
-                showResult('basic-result', result);
+                results.method1 = window.PASSPORT_JSB_METHOD_INVOKER.invoke('isInDarkMode', {});
+                log('方式1成功: 直接调用 invoke', 'success');
             } catch (error) {
-                showResult('basic-result', { error: error.message });
+                results.method1 = { error: error.message };
+                log(`方式1失败: ${error.message}`, 'error');
             }
+            
+            // 方式2: 尝试带回调的调用
+            try {
+                results.method2 = window.PASSPORT_JSB_METHOD_INVOKER.invoke('isInDarkMode', {}, function(result) {
+                    log('回调被调用: ' + JSON.stringify(result), 'info');
+                });
+                log('方式2成功: 带回调调用', 'success');
+            } catch (error) {
+                results.method2 = { error: error.message };
+                log(`方式2失败: ${error.message}`, 'error');
+            }
+            
+            // 方式3: 检查是否有其他调用方法
+            try {
+                if (window.PASSPORT_JSB_METHOD_INVOKER.call) {
+                    results.method3 = window.PASSPORT_JSB_METHOD_INVOKER.call('isInDarkMode', {});
+                    log('方式3成功: call 方法', 'success');
+                } else {
+                    results.method3 = { error: 'call 方法不存在' };
+                }
+            } catch (error) {
+                results.method3 = { error: error.message };
+                log(`方式3失败: ${error.message}`, 'error');
+            }
+            
+            showResult('debug-result', results);
         }
 
-        async function testGetSystemInfo() {
-            try {
-                const result = await callJSB('getSystemInfo');
-                showResult('basic-result', result);
-            } catch (error) {
-                showResult('basic-result', { error: error.message });
-            }
-        }
-
-        // ===== UI 交互测试 =====
+        // ===== 测试函数 =====
         
-        async function testShowToast() {
+        function testIsInDarkMode() {
             try {
-                const result = await callJSB('showToast', {
+                const result = callJSB('isInDarkMode');
+                showResult('basic-result', result);
+            } catch (error) {
+                showResult('basic-result', { error: error.message });
+            }
+        }
+
+        function testIsInTalkBackMode() {
+            try {
+                const result = callJSB('isInTalkBackMode');
+                showResult('basic-result', result);
+            } catch (error) {
+                showResult('basic-result', { error: error.message });
+            }
+        }
+
+        function testGetSystemInfo() {
+            try {
+                const result = callJSB('getSystemInfo');
+                showResult('basic-result', result);
+            } catch (error) {
+                showResult('basic-result', { error: error.message });
+            }
+        }
+
+        function testShowToast() {
+            try {
+                const result = callJSB('showToast', {
                     text: '这是一个测试 Toast 消息！'
                 });
                 showResult('ui-result', result);
@@ -275,9 +416,9 @@
             }
         }
 
-        async function testShowSimpleDialog() {
+        function testShowSimpleDialog() {
             try {
-                const result = await callJSB('showDialog', {
+                const result = callJSB('showDialog', {
                     title: '提示',
                     message: '这是一个简单的对话框测试',
                     cancelable: true,
@@ -291,23 +432,20 @@
             }
         }
 
-        async function testShowComplexDialog() {
+        function testShowComplexDialog() {
             try {
-                const result = await callJSB('showDialog', {
+                const result = callJSB('showDialog', {
                     title: '复杂对话框',
-                    message: '这是一个包含多个按钮的对话框。<br/>支持 <a href="https://www.xiaomi.com">HTML 链接</a>',
+                    message: '这是一个包含多个按钮的对话框',
                     cancelable: true,
                     positiveButton: {
-                        text: '确定',
-                        callbackId: 'dialog-positive'
+                        text: '确定'
                     },
                     negativeButton: {
-                        text: '取消',
-                        callbackId: 'dialog-negative'
+                        text: '取消'
                     },
                     neutralButton: {
-                        text: '稍后',
-                        callbackId: 'dialog-neutral'
+                        text: '稍后'
                     }
                 });
                 showResult('ui-result', result);
@@ -316,14 +454,11 @@
             }
         }
 
-        // ===== 页面操作测试 =====
-        
-        async function testStartPage() {
+        function testStartPage() {
             try {
-                const result = await callJSB('startPage', {
+                const result = callJSB('startPage', {
                     action: 'android.intent.action.VIEW',
-                    data: 'https://www.xiaomi.com',
-                    closeCurrentPage: false
+                    data: 'https://www.xiaomi.com'
                 });
                 showResult('page-result', result);
             } catch (error) {
@@ -331,7 +466,7 @@
             }
         }
 
-        async function testStartCustomPage() {
+        function testStartCustomPage() {
             const url = document.getElementById('custom-url').value;
             if (!url) {
                 log('请输入 URL', 'warn');
@@ -339,10 +474,9 @@
             }
             
             try {
-                const result = await callJSB('startPage', {
+                const result = callJSB('startPage', {
                     action: 'android.intent.action.VIEW',
-                    data: url,
-                    closeCurrentPage: false
+                    data: url
                 });
                 showResult('page-result', result);
             } catch (error) {
@@ -350,13 +484,13 @@
             }
         }
 
-        async function testClosePage(reason) {
+        function testClosePage(reason) {
             if (!confirm(`确定要关闭页面吗？(原因: ${reason})`)) {
                 return;
             }
             
             try {
-                const result = await callJSB('closePage', {
+                const result = callJSB('closePage', {
                     reason: reason
                 });
                 showResult('page-result', result);
@@ -365,83 +499,31 @@
             }
         }
 
-        // ===== 自定义测试 =====
-        
-        async function testCustomMethod() {
-            const methodName = document.getElementById('method-name').value.trim();
-            const paramsText = document.getElementById('method-params').value.trim();
-            
-            if (!methodName) {
-                log('请输入方法名', 'warn');
-                return;
-            }
-            
-            let params = {};
-            if (paramsText) {
-                try {
-                    params = JSON.parse(paramsText);
-                } catch (error) {
-                    log(`参数格式错误: ${error.message}`, 'error');
-                    return;
-                }
-            }
-            
-            try {
-                const result = await callJSB(methodName, params);
-                showResult('custom-result', result);
-            } catch (error) {
-                showResult('custom-result', { error: error.message });
-            }
-        }
-
         // ===== 初始化 =====
         
         document.addEventListener('DOMContentLoaded', function() {
             log('页面加载完成', 'info');
             
-            if (typeof window.PASSPORT_JSB_METHOD_INVOKER !== 'undefined') {
-                log('JSB 可用', 'success');
-            } else {
-                log('JSB 不可用，请在 App 内打开', 'warn');
-            }
+            const statusEl = document.getElementById('jsb-status');
             
-            // 监听对话框回调
-            window.addEventListener('message', function(event) {
-                if (event.data && event.data.type === 'jsb-callback') {
-                    log(`对话框回调: ${event.data.callbackId}`, 'info');
+            setTimeout(() => {
+                if (checkJSB()) {
+                    statusEl.innerHTML = '<span class="status-good">✅ JSB 可用</span>';
+                    log('JSB 初始化成功', 'success');
+                } else {
+                    statusEl.innerHTML = '<span class="status-bad">❌ JSB 不可用</span>';
+                    log('JSB 不可用，请在 App 内打开', 'warn');
                 }
-            });
+                
+                // 显示当前环境信息
+                log(`User Agent: ${navigator.userAgent}`, 'info');
+                log(`当前 URL: ${window.location.href}`, 'info');
+            }, 1000); // 延迟1秒检查，给JSB注入时间
         });
 
-        // 添加一些快捷参数示例
-        function setParamsExample(type) {
-            const textarea = document.getElementById('method-params');
-            const examples = {
-                'empty': '{}',
-                'toast': '{"text": "测试消息"}',
-                'dialog': '{"title": "标题", "message": "内容", "positiveButton": {"text": "确定"}}',
-                'startPage': '{"action": "android.intent.action.VIEW", "data": "https://www.xiaomi.com"}'
-            };
-            
-            if (examples[type]) {
-                textarea.value = examples[type];
-            }
-        }
-
-        // 添加参数示例按钮
-        document.addEventListener('DOMContentLoaded', function() {
-            const customGroup = document.querySelector('.test-group:last-of-type');
-            const exampleDiv = document.createElement('div');
-            exampleDiv.innerHTML = `
-                <p style="margin: 10px 0; font-weight: 500;">参数示例:</p>
-                <button class="btn" style="font-size: 12px; padding: 5px 10px;" onclick="setParamsExample('empty')">空参数</button>
-                <button class="btn" style="font-size: 12px; padding: 5px 10px;" onclick="setParamsExample('toast')">Toast</button>
-                <button class="btn" style="font-size: 12px; padding: 5px 10px;" onclick="setParamsExample('dialog')">Dialog</button>
-                <button class="btn" style="font-size: 12px; padding: 5px 10px;" onclick="setParamsExample('startPage')">StartPage</button>
-            `;
-            
-            const textarea = customGroup.querySelector('textarea');
-            textarea.parentNode.insertBefore(exampleDiv, textarea.nextSibling);
+        // 全局错误处理
+        window.addEventListener('error', function(event) {
+            log(`页面错误: ${event.error ? event.error.message : event.message}`, 'error');
         });
     </script>
 </body>
