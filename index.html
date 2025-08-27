@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passport JSB Demo</title>
+    <title>JSB 功能测试</title>
     <style>
         * {
             margin: 0;
@@ -16,114 +16,71 @@
             line-height: 1.6;
             color: #333;
             background: #f5f5f5;
-            transition: all 0.3s ease;
+            padding: 20px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .status-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .status-item:last-child {
-            border-bottom: none;
-        }
-
-        .status-label {
-            font-weight: 500;
-        }
-
-        .status-value {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-
-        .status-success {
-            background: #e8f5e8;
-            color: #2e7d32;
-        }
-
-        .status-error {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        .status-info {
-            background: #e3f2fd;
-            color: #1565c0;
-        }
-
-        .method-card {
-            background: white;
-            border-radius: 10px;
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .method-title {
-            font-size: 18px;
+        .test-group {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .test-group h3 {
             margin-bottom: 15px;
             color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
         }
 
         .btn {
             background: #007bff;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease;
             margin: 5px;
+            font-size: 14px;
         }
 
         .btn:hover {
             background: #0056b3;
         }
 
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
+        .btn-danger {
+            background: #dc3545;
         }
 
-        .btn-secondary {
-            background: #6c757d;
+        .btn-danger:hover {
+            background: #c82333;
         }
 
-        .btn-secondary:hover {
-            background: #545b62;
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .input-group label {
@@ -135,39 +92,31 @@
         .input-group input,
         .input-group textarea {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
         }
 
-        .result-area {
-            margin-top: 15px;
-            padding: 15px;
+        .result {
+            margin-top: 10px;
+            padding: 10px;
             background: #f8f9fa;
-            border-radius: 6px;
+            border-radius: 4px;
             border-left: 4px solid #007bff;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
-        .result-title {
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-
-        .result-content {
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .log-area {
+        .log {
             background: #1e1e1e;
             color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
             max-height: 300px;
             overflow-y: auto;
             margin-top: 20px;
@@ -175,224 +124,250 @@
 
         .log-item {
             margin-bottom: 5px;
-            padding: 5px;
-            border-radius: 3px;
         }
 
-        .log-info { background: rgba(33, 150, 243, 0.2); }
-        .log-success { background: rgba(76, 175, 80, 0.2); }
-        .log-error { background: rgba(244, 67, 54, 0.2); }
-        .log-warn { background: rgba(255, 152, 0, 0.2); }
-
-        /* 暗黑模式 */
-        body.dark-mode {
-            background: #121212;
-            color: #e0e0e0;
-        }
-
-        .dark-mode .header,
-        .dark-mode .status-card,
-        .dark-mode .method-card {
-            background: #1e1e1e;
-            color: #e0e0e0;
-        }
-
-        .dark-mode .status-item {
-            border-bottom-color: #333;
-        }
-
-        .dark-mode .input-group input,
-        .dark-mode .input-group textarea {
-            background: #2a2a2a;
-            border-color: #444;
-            color: #e0e0e0;
-        }
-
-        .dark-mode .result-area {
-            background: #2a2a2a;
-            border-left-color: #007bff;
-        }
+        .log-success { color: #4caf50; }
+        .log-error { color: #f44336; }
+        .log-warn { color: #ff9800; }
+        .log-info { color: #2196f3; }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- 头部 -->
         <div class="header">
-            <h1>Passport JSB Demo</h1>
-            <p>JavaScript Bridge 功能演示页面</p>
+            <h1>JSB 功能测试</h1>
+            <p>测试各种 JavaScript Bridge 功能</p>
         </div>
 
-        <!-- 状态卡片 -->
-        <div class="status-card">
-            <h3>环境状态</h3>
-            <div class="status-item">
-                <span class="status-label">JSB 可用性</span>
-                <span id="jsb-status" class="status-value">检测中...</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">当前域名</span>
-                <span id="current-domain" class="status-value status-info"></span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">协议</span>
-                <span id="current-protocol" class="status-value status-info"></span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">暗黑模式</span>
-                <span id="dark-mode-status" class="status-value">未知</span>
-            </div>
+        <!-- 基础信息测试 -->
+        <div class="test-group">
+            <h3>基础信息检测</h3>
+            <button class="btn" onclick="testIsInDarkMode()">检测暗黑模式</button>
+            <button class="btn" onclick="testIsInTalkBackMode()">检测TalkBack模式</button>
+            <button class="btn" onclick="testGetSystemInfo()">获取系统信息</button>
+            <div id="basic-result" class="result" style="display: none;"></div>
         </div>
 
-        <!-- 暗黑模式检测 -->
-        <div class="method-card">
-            <h3 class="method-title">暗黑模式检测</h3>
-            <p>检测当前 App 是否处于暗黑模式</p>
-            <button class="btn" onclick="checkDarkMode()">检测暗黑模式</button>
-            <button class="btn btn-secondary" onclick="togglePageDarkMode()">切换页面暗黑模式</button>
-            <div id="dark-mode-result" class="result-area" style="display: none;">
-                <div class="result-title">检测结果:</div>
-                <div id="dark-mode-content" class="result-content"></div>
-            </div>
+        <!-- Toast 和 Dialog 测试 -->
+        <div class="test-group">
+            <h3>UI 交互测试</h3>
+            <button class="btn" onclick="testShowToast()">显示 Toast</button>
+            <button class="btn" onclick="testShowSimpleDialog()">简单对话框</button>
+            <button class="btn" onclick="testShowComplexDialog()">复杂对话框</button>
+            <div id="ui-result" class="result" style="display: none;"></div>
         </div>
 
-        <!-- 自定义方法调用 -->
-        <div class="method-card">
-            <h3 class="method-title">自定义方法调用</h3>
+        <!-- 页面操作测试 -->
+        <div class="test-group">
+            <h3>页面操作测试</h3>
+            <button class="btn" onclick="testStartPage()">打开新页面</button>
+            <button class="btn btn-danger" onclick="testClosePage('cancel')">关闭页面(取消)</button>
+            <button class="btn btn-success" onclick="testClosePage('success')">关闭页面(成功)</button>
+            
+            <div class="input-group" style="margin-top: 15px;">
+                <label>自定义 URL:</label>
+                <input type="text" id="custom-url" placeholder="例如: https://www.xiaomi.com" value="https://www.xiaomi.com">
+            </div>
+            <button class="btn" onclick="testStartCustomPage()">打开自定义页面</button>
+            
+            <div id="page-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 自定义测试 -->
+        <div class="test-group">
+            <h3>自定义测试</h3>
             <div class="input-group">
-                <label for="method-name">方法名:</label>
-                <input type="text" id="method-name" placeholder="输入方法名，如: isInDarkMode" value="isInDarkMode">
+                <label>方法名:</label>
+                <input type="text" id="method-name" value="isInDarkMode">
             </div>
             <div class="input-group">
-                <label for="method-params">参数 (JSON格式):</label>
-                <textarea id="method-params" rows="4" placeholder='{"string": {"key": "value"}, "integer": {"count": 1}}'>{}</textarea>
+                <label>参数 (JSON):</label>
+                <textarea id="method-params" rows="3">{}</textarea>
             </div>
-            <button class="btn" onclick="callCustomMethod()">调用方法</button>
-            <button class="btn btn-secondary" onclick="clearCustomResult()">清除结果</button>
-            <div id="custom-result" class="result-area" style="display: none;">
-                <div class="result-title">调用结果:</div>
-                <div id="custom-content" class="result-content"></div>
-            </div>
+            <button class="btn" onclick="testCustomMethod()">调用方法</button>
+            <div id="custom-result" class="result" style="display: none;"></div>
         </div>
 
-        <!-- 批量测试 -->
-        <div class="method-card">
-            <h3 class="method-title">批量测试</h3>
-            <p>测试多个常见方法的调用</p>
-            <button class="btn" onclick="runBatchTest()">开始批量测试</button>
-            <button class="btn btn-secondary" onclick="clearBatchResult()">清除结果</button>
-            <div id="batch-result" class="result-area" style="display: none;">
-                <div class="result-title">测试结果:</div>
-                <div id="batch-content" class="result-content"></div>
-            </div>
-        </div>
-
-        <!-- 日志区域 -->
-        <div class="log-area" id="log-area">
-            <div><strong>调试日志:</strong></div>
-        </div>
-
-        <!-- 清除日志按钮 -->
-        <div style="text-align: center; margin-top: 20px;">
-            <button class="btn btn-secondary" onclick="clearLogs()">清除日志</button>
-        </div>
+        <!-- 日志 -->
+        <div class="log" id="log"></div>
     </div>
 
     <script>
-        // ===== 工具函数 =====
-        
-        // 日志记录
+        // 日志功能
         function log(message, type = 'info') {
-            const logArea = document.getElementById('log-area');
-            const timestamp = new Date().toLocaleTimeString();
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
             const logItem = document.createElement('div');
             logItem.className = `log-item log-${type}`;
-            logItem.textContent = `[${timestamp}] ${message}`;
-            logArea.appendChild(logItem);
-            logArea.scrollTop = logArea.scrollHeight;
-        }
-
-        // 清除日志
-        function clearLogs() {
-            const logArea = document.getElementById('log-area');
-            logArea.innerHTML = '<div><strong>调试日志:</strong></div>';
-        }
-
-        // 检查 JSB 是否可用
-        function isJSBAvailable() {
-            return typeof window.PASSPORT_JSB_METHOD_INVOKER !== 'undefined';
+            logItem.textContent = `[${time}] ${message}`;
+            logEl.appendChild(logItem);
+            logEl.scrollTop = logEl.scrollHeight;
         }
 
         // JSB 调用封装
         function callJSB(methodName, params = {}) {
             return new Promise((resolve, reject) => {
-                if (!isJSBAvailable()) {
-                    reject(new Error('JSB not available'));
+                if (typeof window.PASSPORT_JSB_METHOD_INVOKER === 'undefined') {
+                    reject(new Error('JSB 不可用'));
                     return;
                 }
                 
                 try {
-                    log(`调用 JSB 方法: ${methodName}`, 'info');
-                    log(`参数: ${JSON.stringify(params)}`, 'info');
-                    
+                    log(`调用: ${methodName}`, 'info');
                     window.PASSPORT_JSB_METHOD_INVOKER.invoke(methodName, params, function(result) {
-                        log(`方法 ${methodName} 返回结果`, 'success');
-                        log(JSON.stringify(result), 'success');
+                        log(`${methodName} 成功: ${JSON.stringify(result)}`, 'success');
                         resolve(result);
                     });
                 } catch (error) {
-                    log(`调用 JSB 方法失败: ${error.message}`, 'error');
+                    log(`${methodName} 失败: ${error.message}`, 'error');
                     reject(error);
                 }
             });
         }
 
-        // ===== 功能函数 =====
+        // 显示结果
+        function showResult(elementId, data) {
+            const el = document.getElementById(elementId);
+            el.style.display = 'block';
+            el.textContent = JSON.stringify(data, null, 2);
+        }
 
-        // 检测暗黑模式
-        async function checkDarkMode() {
+        // ===== 基础信息测试 =====
+        
+        async function testIsInDarkMode() {
             try {
                 const result = await callJSB('isInDarkMode');
-                
-                // 显示结果
-                const resultDiv = document.getElementById('dark-mode-result');
-                const contentDiv = document.getElementById('dark-mode-content');
-                
-                resultDiv.style.display = 'block';
-                contentDiv.textContent = JSON.stringify(result, null, 2);
-                
-                // 更新状态
-                const statusSpan = document.getElementById('dark-mode-status');
-                if (result && typeof result === 'boolean') {
-                    statusSpan.textContent = result ? '是' : '否';
-                    statusSpan.className = `status-value ${result ? 'status-success' : 'status-info'}`;
-                } else if (result && result.data !== undefined) {
-                    const isDark = result.data;
-                    statusSpan.textContent = isDark ? '是' : '否';
-                    statusSpan.className = `status-value ${isDark ? 'status-success' : 'status-info'}`;
-                }
-                
-                log('暗黑模式检测完成', 'success');
-                
+                showResult('basic-result', result);
             } catch (error) {
-                log(`暗黑模式检测失败: ${error.message}`, 'error');
-                
-                const resultDiv = document.getElementById('dark-mode-result');
-                const contentDiv = document.getElementById('dark-mode-content');
-                
-                resultDiv.style.display = 'block';
-                contentDiv.textContent = `错误: ${error.message}`;
+                showResult('basic-result', { error: error.message });
             }
         }
 
-        // 切换页面暗黑模式（仅页面样式）
-        function togglePageDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            log(`页面暗黑模式已${isDark ? '开启' : '关闭'}`, 'info');
+        async function testIsInTalkBackMode() {
+            try {
+                const result = await callJSB('isInTalkBackMode');
+                showResult('basic-result', result);
+            } catch (error) {
+                showResult('basic-result', { error: error.message });
+            }
         }
 
-        // 调用自定义方法
-        async function callCustomMethod() {
+        async function testGetSystemInfo() {
+            try {
+                const result = await callJSB('getSystemInfo');
+                showResult('basic-result', result);
+            } catch (error) {
+                showResult('basic-result', { error: error.message });
+            }
+        }
+
+        // ===== UI 交互测试 =====
+        
+        async function testShowToast() {
+            try {
+                const result = await callJSB('showToast', {
+                    text: '这是一个测试 Toast 消息！'
+                });
+                showResult('ui-result', result);
+            } catch (error) {
+                showResult('ui-result', { error: error.message });
+            }
+        }
+
+        async function testShowSimpleDialog() {
+            try {
+                const result = await callJSB('showDialog', {
+                    title: '提示',
+                    message: '这是一个简单的对话框测试',
+                    cancelable: true,
+                    positiveButton: {
+                        text: '确定'
+                    }
+                });
+                showResult('ui-result', result);
+            } catch (error) {
+                showResult('ui-result', { error: error.message });
+            }
+        }
+
+        async function testShowComplexDialog() {
+            try {
+                const result = await callJSB('showDialog', {
+                    title: '复杂对话框',
+                    message: '这是一个包含多个按钮的对话框。<br/>支持 <a href="https://www.xiaomi.com">HTML 链接</a>',
+                    cancelable: true,
+                    positiveButton: {
+                        text: '确定',
+                        callbackId: 'dialog-positive'
+                    },
+                    negativeButton: {
+                        text: '取消',
+                        callbackId: 'dialog-negative'
+                    },
+                    neutralButton: {
+                        text: '稍后',
+                        callbackId: 'dialog-neutral'
+                    }
+                });
+                showResult('ui-result', result);
+            } catch (error) {
+                showResult('ui-result', { error: error.message });
+            }
+        }
+
+        // ===== 页面操作测试 =====
+        
+        async function testStartPage() {
+            try {
+                const result = await callJSB('startPage', {
+                    action: 'android.intent.action.VIEW',
+                    data: 'https://www.xiaomi.com',
+                    closeCurrentPage: false
+                });
+                showResult('page-result', result);
+            } catch (error) {
+                showResult('page-result', { error: error.message });
+            }
+        }
+
+        async function testStartCustomPage() {
+            const url = document.getElementById('custom-url').value;
+            if (!url) {
+                log('请输入 URL', 'warn');
+                return;
+            }
+            
+            try {
+                const result = await callJSB('startPage', {
+                    action: 'android.intent.action.VIEW',
+                    data: url,
+                    closeCurrentPage: false
+                });
+                showResult('page-result', result);
+            } catch (error) {
+                showResult('page-result', { error: error.message });
+            }
+        }
+
+        async function testClosePage(reason) {
+            if (!confirm(`确定要关闭页面吗？(原因: ${reason})`)) {
+                return;
+            }
+            
+            try {
+                const result = await callJSB('closePage', {
+                    reason: reason
+                });
+                showResult('page-result', result);
+            } catch (error) {
+                showResult('page-result', { error: error.message });
+            }
+        }
+
+        // ===== 自定义测试 =====
+        
+        async function testCustomMethod() {
             const methodName = document.getElementById('method-name').value.trim();
             const paramsText = document.getElementById('method-params').value.trim();
             
@@ -406,152 +381,67 @@
                 try {
                     params = JSON.parse(paramsText);
                 } catch (error) {
-                    log(`参数 JSON 格式错误: ${error.message}`, 'error');
+                    log(`参数格式错误: ${error.message}`, 'error');
                     return;
                 }
             }
             
             try {
                 const result = await callJSB(methodName, params);
-                
-                const resultDiv = document.getElementById('custom-result');
-                const contentDiv = document.getElementById('custom-content');
-                
-                resultDiv.style.display = 'block';
-                contentDiv.textContent = JSON.stringify(result, null, 2);
-                
-                log(`自定义方法 ${methodName} 调用成功`, 'success');
-                
+                showResult('custom-result', result);
             } catch (error) {
-                log(`自定义方法调用失败: ${error.message}`, 'error');
-                
-                const resultDiv = document.getElementById('custom-result');
-                const contentDiv = document.getElementById('custom-content');
-                
-                resultDiv.style.display = 'block';
-                contentDiv.textContent = `错误: ${error.message}`;
+                showResult('custom-result', { error: error.message });
             }
-        }
-
-        // 清除自定义结果
-        function clearCustomResult() {
-            document.getElementById('custom-result').style.display = 'none';
-        }
-
-        // 批量测试
-        async function runBatchTest() {
-            const testMethods = [
-                { name: 'isInDarkMode', params: {} },
-                // 可以添加更多测试方法
-                // { name: 'getDeviceInfo', params: {} },
-                // { name: 'getAppVersion', params: {} }
-            ];
-            
-            const results = [];
-            
-            for (const method of testMethods) {
-                try {
-                    const result = await callJSB(method.name, method.params);
-                    results.push({
-                        method: method.name,
-                        success: true,
-                        result: result
-                    });
-                } catch (error) {
-                    results.push({
-                        method: method.name,
-                        success: false,
-                        error: error.message
-                    });
-                }
-            }
-            
-            const resultDiv = document.getElementById('batch-result');
-            const contentDiv = document.getElementById('batch-content');
-            
-            resultDiv.style.display = 'block';
-            contentDiv.textContent = JSON.stringify(results, null, 2);
-            
-            log('批量测试完成', 'success');
-        }
-
-        // 清除批量测试结果
-        function clearBatchResult() {
-            document.getElementById('batch-result').style.display = 'none';
         }
 
         // ===== 初始化 =====
         
-        function initialize() {
-            log('页面初始化开始', 'info');
+        document.addEventListener('DOMContentLoaded', function() {
+            log('页面加载完成', 'info');
             
-            // 检查 JSB 可用性
-            const jsbStatus = document.getElementById('jsb-status');
-            if (isJSBAvailable()) {
-                jsbStatus.textContent = '可用';
-                jsbStatus.className = 'status-value status-success';
+            if (typeof window.PASSPORT_JSB_METHOD_INVOKER !== 'undefined') {
                 log('JSB 可用', 'success');
             } else {
-                jsbStatus.textContent = '不可用';
-                jsbStatus.className = 'status-value status-error';
-                log('JSB 不可用', 'warn');
+                log('JSB 不可用，请在 App 内打开', 'warn');
             }
             
-            // 显示当前域名和协议
-            document.getElementById('current-domain').textContent = window.location.hostname;
-            document.getElementById('current-protocol').textContent = window.location.protocol;
-            
-            log(`当前域名: ${window.location.hostname}`, 'info');
-            log(`当前协议: ${window.location.protocol}`, 'info');
-            
-            // 自动检测暗黑模式
-            if (isJSBAvailable()) {
-                setTimeout(checkDarkMode, 1000);
-            }
-            
-            log('页面初始化完成', 'success');
-        }
-
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', initialize);
-
-        // 错误处理
-        window.addEventListener('error', function(event) {
-            log(`页面错误: ${event.error.message}`, 'error');
+            // 监听对话框回调
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'jsb-callback') {
+                    log(`对话框回调: ${event.data.callbackId}`, 'info');
+                }
+            });
         });
 
-        // 添加一些预设的参数示例
+        // 添加一些快捷参数示例
         function setParamsExample(type) {
-            const paramsTextarea = document.getElementById('method-params');
+            const textarea = document.getElementById('method-params');
             const examples = {
                 'empty': '{}',
-                'string': '{"string": {"name": "test", "title": "示例"}}',
-                'number': '{"integer": {"count": 10, "id": 123}}',
-                'boolean': '{"boolean": {"enabled": true, "visible": false}}',
-                'mixed': '{"string": {"name": "test"}, "integer": {"count": 10}, "boolean": {"enabled": true}}'
+                'toast': '{"text": "测试消息"}',
+                'dialog': '{"title": "标题", "message": "内容", "positiveButton": {"text": "确定"}}',
+                'startPage': '{"action": "android.intent.action.VIEW", "data": "https://www.xiaomi.com"}'
             };
             
             if (examples[type]) {
-                paramsTextarea.value = examples[type];
+                textarea.value = examples[type];
             }
         }
 
-        // 为页面添加一些快捷按钮
+        // 添加参数示例按钮
         document.addEventListener('DOMContentLoaded', function() {
-            // 在自定义方法调用区域添加示例按钮
-            const methodCard = document.querySelector('.method-card:nth-child(3)');
-            const exampleButtons = document.createElement('div');
-            exampleButtons.innerHTML = `
-                <p style="margin: 10px 0; font-size: 14px; color: #666;">参数示例:</p>
-                <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setParamsExample('empty')">空参数</button>
-                <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setParamsExample('string')">字符串</button>
-                <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setParamsExample('number')">数字</button>
-                <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setParamsExample('boolean')">布尔值</button>
-                <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setParamsExample('mixed')">混合类型</button>
+            const customGroup = document.querySelector('.test-group:last-of-type');
+            const exampleDiv = document.createElement('div');
+            exampleDiv.innerHTML = `
+                <p style="margin: 10px 0; font-weight: 500;">参数示例:</p>
+                <button class="btn" style="font-size: 12px; padding: 5px 10px;" onclick="setParamsExample('empty')">空参数</button>
+                <button class="btn" style="font-size: 12px; padding: 5px 10px;" onclick="setParamsExample('toast')">Toast</button>
+                <button class="btn" style="font-size: 12px; padding: 5px 10px;" onclick="setParamsExample('dialog')">Dialog</button>
+                <button class="btn" style="font-size: 12px; padding: 5px 10px;" onclick="setParamsExample('startPage')">StartPage</button>
             `;
             
-            const textarea = methodCard.querySelector('textarea');
-            textarea.parentNode.insertBefore(exampleButtons, textarea.nextSibling);
+            const textarea = customGroup.querySelector('textarea');
+            textarea.parentNode.insertBefore(exampleDiv, textarea.nextSibling);
         });
     </script>
 </body>
