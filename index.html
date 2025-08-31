@@ -1,1 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie详细显示</title>
+</head>
+<body>
+    <h1>Cookie详细查看器</h1>
+    <button onclick="showCookies()">重新显示Cookie</button>
+    
+    <script>
+        function formatCookies() {
+            const cookies = document.cookie;
+            if (!cookies) {
+                return "当前页面没有Cookie";
+            }
+            
+            const cookieArray = cookies.split('; ');
+            let formattedCookies = "当前页面的Cookie:\n\n";
+            
+            cookieArray.forEach((cookie, index) => {
+                const [name, value] = cookie.split('=');
+                formattedCookies += `${index + 1}. ${name} = ${value || '(空值)'}\n`;
+            });
+            
+            return formattedCookies;
+        }
+        
+        function showCookies() {
+            alert(formatCookies());
+        }
+        
+        // 页面加载时自动显示
+        window.addEventListener('load', showCookies);
+    </script>
+</body>
+</html>
 
